@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Servidor Nginx vulnerable para pruebas de Guardian
+  vulnerable-nginx:
+    image: nginx:alpine
+    container_name: guardian-test-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./test/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
+      - ./test/nginx/html:/usr/share/nginx/html:ro
+    networks:
+      - guardian-test
+    restart: unless-stopped
+
+  # Contenedor de pruebas de Guardian
+  guardian-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.guardian-test
+    container_name: guardian-test-runner
+    depends_on:
+      - vulnerable-nginx
+    environment:
+      - TARGET_URL=http://vulnerable-nginx
+      - BACKUP_DIR=/tmp/guardian_backups
+    volumes:
+      - ./backend:/app/backend:ro
+      - guardian-backups:/tmp/guardian_backups
+    networks:
+      - guardian-test
+    command: go test -v ./backend/pkg/guardian/...
+
+networks:
+  guardian-test:
+    driver: bridge
+
+volumes:
+  guardian-backups:

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardian Test Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .status {
+            margin: 20px 0;
+        }
+        .status-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+        }
+        .status-item.secure {
+            border-left-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Guardian Test Server</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This server is intentionally configured without security headers for testing purposes.
+        </div>
+
+        <div class="status">
+            <h2>Security Status</h2>
+            <div class="status-item">
+                <strong>Content-Security-Policy:</strong> Missing ❌
+            </div>
+            <div class="status-item">
+                <strong>Strict-Transport-Security:</strong> Missing ❌
+            </div>
+            <div class="status-item">
+                <strong>X-Frame-Options:</strong> Missing ❌
+            </div>
+            <div class="status-item">
+                <strong>X-Content-Type-Options:</strong> Missing ❌
+            </div>
+            <div class="status-item">
+                <strong>X-XSS-Protection:</strong> Missing ❌
+            </div>
+        </div>
+
+        <p>This server is used to test PentAGI Guardian's auto-remediation capabilities.</p>
+        <p>Guardian should detect the missing security headers and propose a remediation plan.</p>
+    </div>
+</body>
+</html>
