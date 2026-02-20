@@ -9,6 +9,7 @@ import {
     Plus,
     Settings,
     Settings2,
+    Shield,
     Star,
     Sun,
     UserIcon,
@@ -53,6 +54,7 @@ const MainSidebar = () => {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
     const isFlowsActive = useMatch('/flows/*');
+    const isGuardianActive = useMatch('/guardian/*');
     const isSettingsActive = useMatch('/settings/*');
 
     const { authInfo, logout } = useUser();
@@ -106,6 +108,26 @@ const MainSidebar = () => {
                                     showOnHover
                                 >
                                     <Link to="/flows/new">
+                                        <Plus />
+                                    </Link>
+                                </SidebarMenuAction>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={!!isGuardianActive}
+                                >
+                                    <Link to="/guardian">
+                                        <Shield />
+                                        Guardian
+                                    </Link>
+                                </SidebarMenuButton>
+                                <SidebarMenuAction
+                                    asChild
+                                    className="data-[state=open]:bg-accent rounded-sm"
+                                    showOnHover
+                                >
+                                    <Link to="/guardian/new">
                                         <Plus />
                                     </Link>
                                 </SidebarMenuAction>

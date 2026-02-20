@@ -29,6 +29,9 @@ const SettingsPrompt = lazy(() => import('@/pages/settings/settings-prompt'));
 const SettingsPrompts = lazy(() => import('@/pages/settings/settings-prompts'));
 const SettingsProvider = lazy(() => import('@/pages/settings/settings-provider'));
 const SettingsProviders = lazy(() => import('@/pages/settings/settings-providers'));
+const GuardianTasks = lazy(() => import('@/pages/guardian/guardian-tasks'));
+const NewGuardianTask = lazy(() => import('@/pages/guardian/new-guardian-task'));
+const RemediationPlan = lazy(() => import('@/pages/guardian/remediation-plan'));
 
 const App = () => {
     const renderProtectedRoute = () => (
@@ -77,6 +80,22 @@ const App = () => {
                                                         </FlowProvider>
                                                     }
                                                     path="flows/:flowId"
+                                                />
+                                            </Route>
+
+                                            {/* Guardian section */}
+                                            <Route element={<FlowsLayout />}>
+                                                <Route
+                                                    element={<GuardianTasks />}
+                                                    path="guardian"
+                                                />
+                                                <Route
+                                                    element={<NewGuardianTask />}
+                                                    path="guardian/new"
+                                                />
+                                                <Route
+                                                    element={<RemediationPlan />}
+                                                    path="guardian/:id"
                                                 />
                                             </Route>
 
