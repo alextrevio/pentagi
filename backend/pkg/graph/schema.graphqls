@@ -808,3 +808,184 @@ type Subscription {
   providerUpdated: ProviderConfig!
   providerDeleted: ProviderConfig!
 }
+
+# ==================== Guardian Auto-Remediation Types ====================
+
+enum RemediationStatus {
+  pending_approval
+  approved
+  rejected
+  in_progress
+  completed
+  failed
+  rolled_back
+}
+
+enum RiskLevel {
+  low
+  medium
+  high
+  critical
+}
+
+enum VulnerabilityType {
+  missing_security_headers
+  weak_ssl_configuration
+  outdated_software
+  sql_injection
+  xss
+  csrf
+  open_ports
+  weak_authentication
+  misconfiguration
+}
+
+type RemediationPlan {
+  id: ID!
+  vulnerabilityId: String!
+  vulnerabilityType: VulnerabilityType!
+  description: String!
+  steps: [RemediationStep!]!
+  riskLevel: RiskLevel!
+  estimatedTime: Int!
+  requiresBackup: Boolean!
+  requiresDowntime: Boolean!
+  rollbackPlan: String!
+  status: RemediationStatus!
+  flowId: ID!
+  taskId: ID
+  createdAt: Time!
+  updatedAt: Time!
+  approvedBy: String
+  approvedAt: Time
+  executedAt: Time
+  completedAt: Time
+}
+
+type RemediationStep {
+  id: Int!
+  toolName: String!
+  description: String!
+  arguments: JSON!
+  order: Int!
+  riskLevel: RiskLevel!
+  status: RemediationStatus!
+  result: String
+  executedAt: Time
+}
+
+type VulnerabilityAnalysis {
+  vulnerabilityId: String!
+  type: VulnerabilityType!
+  severity: RiskLevel!
+  description: String!
+  affectedResources: [String!]!
+  recommendations: [String!]!
+  estimatedImpact: String!
+  requiresDowntime: Boolean!
+}
+
+type GuardianTask {
+  id: ID!
+  title: String!
+  targetUrl: String!
+  vulnerabilityType: VulnerabilityType!
+  status: StatusType!
+  analysis: VulnerabilityAnalysis
+  remediationPlan: RemediationPlan
+  flowId: ID!
+  taskId: ID
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type BackupInfo {
+  id: String!
+  filePath: String!
+  backupPath: String!
+  createdAt: Time!
+  size: Int!
+}
+
+# ==================== Guardian Queries ====================
+
+extend type Query {
+  # Get all Guardian tasks
+  guardianTasks(flowId: ID!): [GuardianTask!]!
+  
+  # Get a specific Guardian task
+  guardianTask(id: ID!): GuardianTask
+  
+  # Get all remediation plans
+  remediationPlans(flowId: ID!, status: RemediationStatus): [RemediationPlan!]!
+  
+  # Get a specific remediation plan
+  remediationPlan(id: ID!): RemediationPlan
+  
+  # Get all backups
+  backups(filePath: String): [BackupInfo!]!
+  
+  # Analyze a vulnerability
+  analyzeVulnerability(targetUrl: String!, vulnerabilityType: VulnerabilityType!): VulnerabilityAnalysis!
+}
+
+# ==================== Guardian Mutations ====================
+
+extend type Mutation {
+  # Create a new Guardian task
+  createGuardianTask(
+    flowId: ID!
+    title: String!
+    targetUrl: String!
+    vulnerabilityType: VulnerabilityType!
+  ): GuardianTask!
+  
+  # Create a remediation plan
+  createRemediationPlan(
+    flowId: ID!
+    taskId: ID
+    vulnerabilityId: String!
+    vulnerabilityType: VulnerabilityType!
+    targetUrl: String!
+  ): RemediationPlan!
+  
+  # Approve a remediation plan
+  approveRemediationPlan(
+    id: ID!
+    approvedBy: String!
+  ): RemediationPlan!
+  
+  # Reject a remediation plan
+  rejectRemediationPlan(
+    id: ID!
+    reason: String!
+  ): RemediationPlan!
+  
+  # Execute a remediation plan
+  executeRemediationPlan(id: ID!): RemediationPlan!
+  
+  # Rollback a remediation
+  rollbackRemediation(
+    planId: ID!
+    backupId: String!
+  ): RemediationPlan!
+  
+  # Create a backup
+  createBackup(filePath: String!): BackupInfo!
+  
+  # Restore a backup
+  restoreBackup(backupId: String!): BackupInfo!
+  
+  # Delete a backup
+  deleteBackup(backupId: String!): Boolean!
+}
+
+# ==================== Guardian Subscriptions ====================
+
+extend type Subscription {
+  # Subscribe to Guardian task updates
+  guardianTaskUpdated(flowId: ID!): GuardianTask!
+  
+  # Subscribe to remediation plan updates
+  remediationPlanUpdated(flowId: ID!): RemediationPlan!
+}
