@@ -1,0 +1,39 @@
+.PHONY: help guardian-migrate guardian-test guardian-build guardian-clean
+
+help:
+	@echo "Guardian Makefile Commands:"
+	@echo "  make guardian-migrate    - Run Guardian database migrations"
+	@echo "  make guardian-test       - Run Guardian unit tests"
+	@echo "  make guardian-build      - Build Guardian module"
+	@echo "  make guardian-clean      - Clean Guardian build artifacts"
+	@echo "  make guardian-dev        - Start Guardian development environment"
+
+guardian-migrate:
+	@echo "Running Guardian database migrations..."
+	cd backend && goose -dir migrations/sql postgres "$(DATABASE_URL)" up
+
+guardian-test:
+	@echo "Running Guardian tests..."
+	cd backend && go test -v ./pkg/guardian/...
+
+guardian-build:
+	@echo "Building Guardian module..."
+	cd backend && go build -o bin/pentagi ./cmd/pentagi
+
+guardian-clean:
+	@echo "Cleaning Guardian build artifacts..."
+	cd backend && rm -rf bin/
+
+guardian-dev:
+	@echo "Starting Guardian development environment..."
+	docker-compose -f docker-compose-guardian-test.yml up -d
+	@echo "Guardian test environment is running at http://localhost:8080"
+	@echo "Use 'docker-compose -f docker-compose-guardian-test.yml logs -f' to view logs"
+
+guardian-dev-stop:
+	@echo "Stopping Guardian development environment..."
+	docker-compose -f docker-compose-guardian-test.yml down
+
+guardian-dev-restart:
+	@echo "Restarting Guardian development environment..."
+	docker-compose -f docker-compose-guardian-test.yml restart
